@@ -1,0 +1,45 @@
+backend:
+  replicaCount: 2
+  image:
+    repository: gcr.io/round-fusion-426008-d8/back_img
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    port: 80
+    type: ClusterIP
+
+frontend:
+  replicaCount: 2
+  image:
+    repository: gcr.io/round-fusion-426008-d8/front_img
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    port: 80
+    type: ClusterIP
+
+secretName: database-secret 
+ 
+secret: 
+  host: MzQuNDUuMTkuMTAz
+  username: cG9zdGdyZXM= 
+  password: LmtuOlxFJDxseXI6Z00rRg== 
+  dbname: cG9zdGdyZXM=
+
+ingress:
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: "/$1"
+  rules:
+    - paths:
+        - path: /?(.*)
+          pathType: Prefix
+          backend:
+            serviceName: my-app-frontend-service
+            servicePort: 80
+        - path: /api/?(.*)
+          pathType: Prefix
+          backend:
+            serviceName: my-app-backend-service
+            servicePort: 3000
